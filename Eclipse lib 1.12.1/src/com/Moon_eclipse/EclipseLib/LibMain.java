@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -322,7 +323,41 @@ public class LibMain extends JavaPlugin{
 		
 		
 	}
-
-	
-
+	public static boolean IsWithin(Location BlockLocation, String position1, String position2)
+	{
+		boolean b = false;
+		int xp,yp,zp,x1,y1,z1,x2,y2,z2;
+		xp = (int) BlockLocation.getX();
+		yp = (int) BlockLocation.getY();
+		zp = (int) BlockLocation.getZ();
+		String[] split1 = position1.split(",");
+		String[] split2 = position2.split(",");
+		x1 = Integer.parseInt(split1[0]);
+		y1 = Integer.parseInt(split1[1]);
+		z1 = Integer.parseInt(split1[2]);
+		x2 = Integer.parseInt(split2[0]);
+		y2 = Integer.parseInt(split2[1]);
+		z2 = Integer.parseInt(split2[2]);
+		
+		if((xp >= x1 && xp <= x2) || (xp >= x2 && xp <= x1))
+		{
+			if((yp >= y1 && yp <= y2) || (yp >= y2 && yp <= y1))
+			{
+				if((zp >= z1 && zp <= z2) || (zp >= z2 && zp <= z1))
+				{
+					b = true;
+				}
+			}
+		}
+		
+		return b;
+	}
+	public static double double_round (double value, int precision) {
+	    int scale = (int) Math.pow(10, precision);
+	    return (double) Math.round(value * scale) / scale;
+	}
+	public static float float_round (float value, int precision) {
+	    int scale = (int) Math.pow(10, precision);
+	    return (float) Math.round(value * scale) / scale;
+	}
 }
