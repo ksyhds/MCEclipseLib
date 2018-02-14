@@ -1,17 +1,21 @@
 package com.Moon_eclipse.EclipseLib;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -19,6 +23,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
 import net.minecraft.server.v1_12_R1.NBTTagList;
@@ -359,5 +364,37 @@ public class LibMain extends JavaPlugin{
 	public static float float_round (float value, int precision) {
 	    int scale = (int) Math.pow(10, precision);
 	    return (float) Math.round(value * scale) / scale;
+	}
+	public static double getRangeRandomDouble(double min, double max)
+	{
+		Random ran = new Random();
+		double randomValue = min + (max - min) * ran.nextDouble();
+		return randomValue;
+	}
+	public static boolean InventoryIsFull(Player p)
+	{
+		boolean re = true;
+		
+		Inventory inv = p.getInventory();
+		
+		for(int i = 0; i < inv.getSize() ; i++)
+		{
+			ItemStack item = inv.getItem(i);
+			if(item == null || item.getTypeId() == 0)
+			{
+				re = false;
+				return re;
+			}
+		}
+		
+		return re;
+	}
+	public static float getPlayerSwingCooltime(Player player) 
+	{
+		float re = 0.0f;
+		
+		re = (float) ((CraftPlayer)player).getHandle().O;
+		
+		return re;
 	}
 }
