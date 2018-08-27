@@ -1,21 +1,20 @@
 package com.Moon_eclipse.EclipseLib;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
-import org.bukkit.Bukkit;
+import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.Configuration;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -23,14 +22,24 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import net.minecraft.server.v1_12_R1.EntityHuman;
+import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.Property;
+
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.NBTTagInt;
 import net.minecraft.server.v1_12_R1.NBTTagList;
 
 public class LibMain extends JavaPlugin{
 	
-	public void onEnable(){}
+	static Configuration c;
+	private static LibMain instance;
+	
+	public void onEnable()
+	{
+		instance = this;
+		this.saveDefaultConfig();
+		c = this.getConfig();		
+	}
 	public void onDisable(){}
 	
 	public static boolean hasString(List<String> lore, String name)
@@ -271,6 +280,10 @@ public class LibMain extends JavaPlugin{
 	public static ItemStack hideFlags_Unbreak(ItemStack item)
     {
 		item = removeAttributes(item);
+		if(item.getType() == Material.SKULL_ITEM) {
+            return item;
+        }
+		
 		ItemMeta im = item.getItemMeta();
 		im.setUnbreakable(true);
 		item.setItemMeta(im);
@@ -396,5 +409,71 @@ public class LibMain extends JavaPlugin{
 		re = (float) ((CraftPlayer)player).getHandle().O;
 		
 		return re;
+	}
+	public static ItemStack getSkull(String url, String ItemName) 
+	{
+		ItemStack skull= new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+
+        if (url == null || url.isEmpty())
+            return skull;
+
+        ItemMeta skullMeta = skull.getItemMeta();
+        String Server_UUID_FOR_HEAD = get_UUID_From_config(ItemName);
+        GameProfile profile = new GameProfile(UUID.fromString(Server_UUID_FOR_HEAD), null);
+        byte[] encodedData = Base64.encodeBase64(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
+        profile.getProperties().put("textures", new Property("textures", new String(encodedData)));
+        Field profileField = null;
+
+        try {
+            profileField = skullMeta.getClass().getDeclaredField("profile");
+        } catch (NoSuchFieldException | SecurityException e) {
+            e.printStackTrace();
+        }
+
+        profileField.setAccessible(true);
+
+        try {
+            profileField.set(skullMeta, profile);
+        } catch (IllegalArgumentException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        skull.setItemMeta(skullMeta);
+        return skull;
+	}
+	public static String get_UUID_From_config(String ItemName)
+	{
+		if(!c.contains("config." + ItemName))
+		{
+			String uuid = UUID.randomUUID().toString();
+			
+			c.set("config." + ItemName, uuid);
+			
+			getInstance().saveConfig();
+			
+			return uuid;
+		}
+		else
+		{
+			return c.getString("config." + ItemName);
+		}
+	}
+	public static LibMain getInstance()
+	{
+		return instance;
+	}	
+	public static int getNumberofList(List<String> list, String string)
+	{
+		int re = 0;
+		for(String str : list)
+		{
+			if(str.equals(string))
+			{
+				return re;
+			}
+			re++;
+		}
+		
+		return -1;
 	}
 }
