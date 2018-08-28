@@ -12,8 +12,8 @@ import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -25,9 +25,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.NBTTagInt;
-import net.minecraft.server.v1_12_R1.NBTTagList;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import net.minecraft.server.v1_13_R2.NBTTagInt;
+import net.minecraft.server.v1_13_R2.NBTTagList;
+
 
 public class LibMain extends JavaPlugin{
 	
@@ -111,7 +112,7 @@ public class LibMain extends JavaPlugin{
     		{
     			if(
     					!(inv.getItem(i).equals(null))
-    					&& inv.getItem(i).getTypeId() == code 
+    					&& inv.getItem(i).getType().getId() == code 
     					&& inv.getItem(i).getData().getData() == meta 
     					&& inv.getItem(i).getAmount() > 0
     					&& inv.getItem(i).getItemMeta().hasDisplayName()
@@ -144,7 +145,7 @@ public class LibMain extends JavaPlugin{
     		{
     			if(
     					!(inv.getItem(i).equals(null))
-    					&& inv.getItem(i).getTypeId() == code 
+    					&& inv.getItem(i).getType().getId() == code 
     					&& inv.getItem(i).getAmount() > 0
     			  )
     				{
@@ -176,7 +177,7 @@ public class LibMain extends JavaPlugin{
     		{
     			if(
     					!(inv.getItem(i).equals(null))
-    					&& inv.getItem(i).getTypeId() == code 
+    					&& inv.getItem(i).getType().getId() == code 
     					&& inv.getItem(i).getAmount() > 0
     					&& inv.getItem(i).getItemMeta().hasDisplayName()
     					&& inv.getItem(i).getItemMeta().getDisplayName().equals(Disname3)
@@ -199,7 +200,7 @@ public class LibMain extends JavaPlugin{
     }
     public static ItemStack createItem(int typeId, int damage, int amount, String name, List<String> lore, String color, List<String> enchants)
 	{
-    	ItemStack i = new ItemStack(typeId);
+    	ItemStack i = new ItemStack(Material.COMMAND_BLOCK);
 		i.setDurability((short) damage);
 		i.setAmount(amount);
 		ItemMeta im = i.getItemMeta();
@@ -223,7 +224,7 @@ public class LibMain extends JavaPlugin{
 				//'16: 1'
 				int enchantname = Integer.parseInt(enchant.substring(0, enchant.length() - 3));
 				int level = Integer.parseInt(enchant.substring(enchant.length() - 1));
-				i.addUnsafeEnchantment(Enchantment.getById(enchantname), level);
+				i.addUnsafeEnchantment(Enchantment.getByKey(enchantname), level);
 			}
 		}
 		i = removeAttributes(i);
@@ -245,11 +246,11 @@ public class LibMain extends JavaPlugin{
         if(i == null) {
             return i;
         }
-        if(i.getType() == Material.BOOK_AND_QUILL) {
+        if(i.getType() == Material.WRITABLE_BOOK) {
             return i;
         }
         ItemStack item = i.clone();
-        net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+        net.minecraft.server.v1_13_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         NBTTagCompound tag;
         if (!nmsStack.hasTag()){
             tag = new NBTTagCompound();
@@ -265,7 +266,7 @@ public class LibMain extends JavaPlugin{
     }
 	public static ItemStack hideFlags(ItemStack item)
     {
-        net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+        net.minecraft.server.v1_13_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         NBTTagCompound tag;
          if (!nmsStack.hasTag()) {
             tag = new NBTTagCompound();
@@ -280,14 +281,14 @@ public class LibMain extends JavaPlugin{
 	public static ItemStack hideFlags_Unbreak(ItemStack item)
     {
 		item = removeAttributes(item);
-		if(item.getType() == Material.SKULL_ITEM) {
+		if(item.getType() == Material.SKELETON_WALL_SKULL) {
             return item;
         }
 		
 		ItemMeta im = item.getItemMeta();
 		im.setUnbreakable(true);
 		item.setItemMeta(im);
-        net.minecraft.server.v1_12_R1.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+        net.minecraft.server.v1_13_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
         NBTTagCompound tag;
          if (!nmsStack.hasTag()) {
             tag = new NBTTagCompound();
@@ -317,7 +318,7 @@ public class LibMain extends JavaPlugin{
 	}
 	public static ItemStack ReCreateItem(ItemStack is)
 	{
-		int type = is.getTypeId();
+		int type = is.getType().getId();
 		int amount = is.getAmount();
 		short damage = is.getDurability();
 		ItemMeta im = is.getItemMeta();
@@ -393,7 +394,7 @@ public class LibMain extends JavaPlugin{
 		for(int i = 0; i < inv.getSize() ; i++)
 		{
 			ItemStack item = inv.getItem(i);
-			if(item == null || item.getTypeId() == 0)
+			if(item == null || item.getType().getId() == 0)
 			{
 				re = false;
 				return re;
@@ -412,7 +413,7 @@ public class LibMain extends JavaPlugin{
 	}
 	public static ItemStack getSkull(String url, String ItemName) 
 	{
-		ItemStack skull= new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+		ItemStack skull= new ItemStack(Material.SKELETON_WALL_SKULL, 1, (short) 3);
 
         if (url == null || url.isEmpty())
             return skull;
