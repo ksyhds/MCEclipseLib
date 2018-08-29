@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,6 +18,7 @@ import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -25,6 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 
+import net.minecraft.server.v1_13_R2.IMaterial;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.NBTTagInt;
 import net.minecraft.server.v1_13_R2.NBTTagList;
@@ -37,9 +40,7 @@ public class LibMain extends JavaPlugin{
 	
 	public void onEnable()
 	{
-		instance = this;
-		this.saveDefaultConfig();
-		c = this.getConfig();		
+		instance = this;	
 	}
 	public void onDisable(){}
 	
@@ -198,40 +199,9 @@ public class LibMain extends JavaPlugin{
     	}
     	return hasitem;
     }
-    public static ItemStack createItem(int typeId, int damage, int amount, String name, List<String> lore, String color, List<String> enchants)
-	{
-    	ItemStack i = new ItemStack(Material.COMMAND_BLOCK);
-		i.setDurability((short) damage);
-		i.setAmount(amount);
-		ItemMeta im = i.getItemMeta();
-		String ColorHex = color;
-		try
-		{
-			if(typeId == 298 || typeId == 299 || typeId == 300 || typeId == 301)
-			{
-				LeatherArmorMeta im2 = (LeatherArmorMeta) im;
-				im2.setColor(Color.fromRGB(Integer.parseInt(ColorHex, 16)));
-			}
-		}catch(Exception e){}
-		im.setDisplayName(name);
-		im.setLore(lore);
-		i.setItemMeta(im);
-		Random rnd = new Random();
-		if(enchants != null && !(enchants.isEmpty()) && !(enchants.toString().equals("")))
-		{
-			for(String enchant : enchants)
-			{
-				//'16: 1'
-				int enchantname = Integer.parseInt(enchant.substring(0, enchant.length() - 3));
-				int level = Integer.parseInt(enchant.substring(enchant.length() - 1));
-				i.addUnsafeEnchantment(Enchantment.getByKey(enchantname), level);
-			}
-		}
-		i = removeAttributes(i);
-		return i;
-	}
 	public static void AddItem(Player p, Inventory inv, int code, int meta,int amount, String Disname, String lore)
 	{
+		/*
 		ItemStack item = new ItemStack(code, amount,(short) 0, (byte) meta);
 		ItemMeta im = item.getItemMeta();
 		List<String> loreSet = new ArrayList<String>();
@@ -240,28 +210,40 @@ public class LibMain extends JavaPlugin{
 		im.setLore(loreSet);
 		item.setItemMeta(im);
 		inv.addItem(item);
+		*/
 	}
 	public static ItemStack removeAttributes(ItemStack i)
 	{
-        if(i == null) {
+        if(i == null) 
+        {
             return i;
         }
-        if(i.getType() == Material.WRITABLE_BOOK) {
+        
+        if(i.getType() == Material.WRITTEN_BOOK) 
+        {
             return i;
         }
-        ItemStack item = i.clone();
-        net.minecraft.server.v1_13_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+        
+        ItemStack item = new ItemStack(i.getType());        
+        item.setItemMeta(i.getItemMeta());
+        
+        net.minecraft.server.v1_13_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);          
+        
         NBTTagCompound tag;
-        if (!nmsStack.hasTag()){
+        
+        if (!nmsStack.hasTag())
+        {
             tag = new NBTTagCompound();
             nmsStack.setTag(tag);
         }
-        else {
+        else 
+        {
             tag = nmsStack.getTag();
         }
         NBTTagList am = new NBTTagList();
         tag.set("AttributeModifiers", am);
         nmsStack.setTag(tag);
+                
         return CraftItemStack.asCraftMirror(nmsStack);
     }
 	public static ItemStack hideFlags(ItemStack item)
@@ -281,23 +263,36 @@ public class LibMain extends JavaPlugin{
 	public static ItemStack hideFlags_Unbreak(ItemStack item)
     {
 		item = removeAttributes(item);
-		if(item.getType() == Material.SKELETON_WALL_SKULL) {
+		
+		if(item.getType() == Material.PLAYER_WALL_HEAD) 
+		{
             return item;
         }
 		
 		ItemMeta im = item.getItemMeta();
+		
 		im.setUnbreakable(true);
+		
 		item.setItemMeta(im);
+		
         net.minecraft.server.v1_13_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
+        
         NBTTagCompound tag;
-         if (!nmsStack.hasTag()) {
+        
+        if (!nmsStack.hasTag()) 
+        {
             tag = new NBTTagCompound();
             nmsStack.setTag(tag);
-        } else {
+        } 
+        else 
+        {
             tag = nmsStack.getTag();
         }
+         
         tag.set("HideFlags", new NBTTagInt(63));
+        
         nmsStack.setTag(tag);
+        
         return CraftItemStack.asCraftMirror(nmsStack);
     }
 	public static List<String> ChangeString(String PlaceHolder, String NextString, List<String> lore)
@@ -316,8 +311,10 @@ public class LibMain extends JavaPlugin{
 		}
 		return newlore;
 	}
+	/*
 	public static ItemStack ReCreateItem(ItemStack is)
 	{
+		
 		int type = is.getType().getId();
 		int amount = is.getAmount();
 		short damage = is.getDurability();
@@ -341,7 +338,9 @@ public class LibMain extends JavaPlugin{
 		return ReCreatedItem;
 		
 		
+		
 	}
+	*/
 	public static boolean IsWithin(Location BlockLocation, String position1, String position2)
 	{
 		boolean b = false;
@@ -413,7 +412,7 @@ public class LibMain extends JavaPlugin{
 	}
 	public static ItemStack getSkull(String url, String ItemName) 
 	{
-		ItemStack skull= new ItemStack(Material.SKELETON_WALL_SKULL, 1, (short) 3);
+		ItemStack skull= new ItemStack(Material.PLAYER_WALL_HEAD, 1, (short) 3);
 
         if (url == null || url.isEmpty())
             return skull;
