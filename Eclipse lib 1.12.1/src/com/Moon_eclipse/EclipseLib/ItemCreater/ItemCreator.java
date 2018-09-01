@@ -1,5 +1,6 @@
 package com.Moon_eclipse.EclipseLib.ItemCreater;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Color;
@@ -25,11 +26,15 @@ public class ItemCreator
 		
 		Material Target_Material = Material.getMaterial(Material_Name);
 		
-		ItemStack Target_Item = new ItemStack(Target_Material, Amount, Damage);
+		ItemStack Target_Item = new ItemStack(Target_Material, Amount);
+		
+		Target_Item.setDurability(Damage);	
 		
 		ItemMeta Target_Item_Meta = Target_Item.getItemMeta();
 		
 		Target_Item_Meta.setDisplayName(Display_Name);
+		
+		Lore = setLoreColor(Lore);
 		
 		Target_Item_Meta.setLore(Lore);
 		
@@ -67,6 +72,17 @@ public class ItemCreator
 	    Target_Item = LibMain.hideFlags_Unbreak(Target_Item);
 	    
 		return Target_Item;
+	}
+	public static List<String> setLoreColor(List<String> LoreList)
+	{
+		List<String> new_lore = new ArrayList<String>();
+		
+		for(String lore : LoreList)
+		{
+			new_lore.add(lore.replace("&", "§"));
+		}
+		
+		return new_lore;
 	}
 	
 	public static boolean Is_This_LetherArmor(Material Target)

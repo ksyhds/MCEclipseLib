@@ -224,7 +224,8 @@ public class LibMain extends JavaPlugin{
             return i;
         }
         
-        ItemStack item = new ItemStack(i.getType());        
+        ItemStack item = new ItemStack(i.getType());     
+        item.setAmount(i.getAmount());
         item.setItemMeta(i.getItemMeta());
         
         net.minecraft.server.v1_13_R2.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);          
