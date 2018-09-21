@@ -121,4 +121,20 @@ public class ItemCreator
 		
 		return new_itemstack;
 	}
+	public static ItemStack getPlaceHoldered_ItemStack(ItemStack Target_Item, String PlaceHolder, String NextString)
+	{
+		ItemMeta Target_Meta = Target_Item.getItemMeta();
+		
+		List<String> Lore = Target_Meta.getLore();
+		
+		Lore = LibMain.ChangeString(PlaceHolder, NextString, Lore);
+		
+		Target_Meta.setLore(Lore);
+		
+		Target_Item.setItemMeta(Target_Meta);
+		
+		return Target_Item;
+
+		
+	}
 }
